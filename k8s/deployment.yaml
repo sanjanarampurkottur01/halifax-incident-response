@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: halifax-incident-response-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: halifax-incident-response
+  template:
+    metadata:
+      labels:
+        app: halifax-incident-response
+    spec:
+      containers:
+      - name: halifax-incident-response-container
+        image: gcr.io/halifax-incident-images/halifax-inciden-response:latest
+        ports:
+        - containerPort: 8050
