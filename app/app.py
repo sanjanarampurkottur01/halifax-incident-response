@@ -14,16 +14,25 @@ filtered_df = df[df['CITY'].isin(top_locations)]
 # Initialize the app
 app = Dash(__name__)
 
+# Define the server variable explicitly
+server = app.server
+
+sorted_df = filtered_df.groupby('CITY').size().reset_index(name='INCIDENT_COUNT').sort_values(by='INCIDENT_COUNT', ascending=False)
+
+fig = px.bar(sorted_df, x='CITY', y='INCIDENT_COUNT')
+fig.update_layout(title={
+    'text': "Incident Counts in HRM",
+    'x': 0.5,
+    'xanchor': 'center'
+	}, xaxis_title="City", yaxis_title="# of Incidents")
+
 # App layout
 app.layout = html.Div([
     html.H1(style={'textAlign': "center"}, children='Halifax Incidents'),
     dash_table.DataTable(data=df.to_dict('records'), page_size=10),
-    dcc.Graph(figure=px.histogram(filtered_df, x='CITY', y='INCIDENT_NUMBER', histfunc='count'))
+    dcc.Graph(figure=fig)
 ])
-
-# Define the server variable explicitly
-server = app.server
 
 # Run the app
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

@@ -1,0 +1,31 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/halifax-incident-images/halifax-incident-response:latest",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "gcr.io/halifax-incident-images/halifax-incident-response:latest",
+      ]
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: Deploy
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        PROJECT=$$(gcloud config get-value core/project)          
+        gke-gcloud-auth-plugin --version
+        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+        gcloud container clusters get-credentials $PROJECT_NAME --zone $ZONE --project $PROJECT_ID
+        kubectl apply -f deployment.yaml
+
+images:
+  - gcr.io/halifax-incident-images/halifax-incident-response:latest
